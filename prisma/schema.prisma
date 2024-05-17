@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+
+model Consulta {
+  id_consulta   Int    @id @default(autoincrement())
+  fecha  DateTime
+  diagnostico String
+
+  historia_clinica Historia_clinica[]
+}
+
+model Hospitalizacion {
+  id_hospitalizacion    Int    @id @default(autoincrement())
+  fecha_entrada  DateTime
+  fecha_salida  DateTime
+  historia_clinica Historia_clinica[]
+}
+
+model Departamentos {
+  id_dapartamento    Int    @id @default(autoincrement())
+  nombre  String
+  especialidad  String
+
+  doctor Doctor[]
+}
+
+model Ubicacion {
+  id_ubicacion    Int    @id @default(autoincrement())
+  estado  String
+  ciudad  String
+  municipio  String
+  direccion  String
+
+  doctor Doctor[]
+  paciente Paciente[]
+}
+
+model Doctor {
+  id_doctor    Int    @id @default(autoincrement())
+  nombre  String
+  apellido  String
+  cedula  Int
+  fecha_nacimiento  DateTime
+
+  id_departamento Departamentos @relation(fields: [departamentoID], references: [id_dapartamento])
+  departamentoID Int
+
+  id_ubicacion Ubicacion @relation(fields: [ubicacionID], references: [id_ubicacion])
+  ubicacionID Int
+
+  historia_clinica Historia_clinica[]
+
+}
+
+model Paciente {
+  id_paciente    Int    @id @default(autoincrement())
+  nombre  String
+  apellido  String
+  cedula  Int
+  fecha_nacimiento  DateTime
+
+  id_ubicacion Ubicacion @relation(fields: [ubicacionID], references: [id_ubicacion])
+  ubicacionID Int
+  
+  historia_clinica Historia_clinica[]
+}
+
+model Historia_clinica {
+  id_historiaClinica    Int    @id @default(autoincrement())
+  fecha  DateTime
+  descripcion String
+
+  id_doctor Doctor @relation(fields: [doctorID], references: [id_doctor])
+  doctorID Int
+
+  id_paciente Paciente @relation(fields: [pacienteID], references: [id_paciente])
+  pacienteID Int
+
+  id_consulta Consulta @relation(fields: [consultaID], references: [id_consulta])
+  consultaID Int
+  
+  id_hospitalizacion Hospitalizacion @relation(fields: [hospitalizacionID], references: [id_hospitalizacion])
+  hospitalizacionID Int
+  
+  
+}
